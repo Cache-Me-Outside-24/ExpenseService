@@ -5,8 +5,12 @@ import uvicorn
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
+from resources import create_expense, get_expense_from_id
 
 app = FastAPI()
+
+app.include_router(create_expense.router)
+app.include_router(get_expense_from_id.router)
 
 # set up middleware logging
 logging.basicConfig(level=logging.INFO)
