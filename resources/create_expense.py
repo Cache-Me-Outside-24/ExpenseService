@@ -70,5 +70,5 @@ def create_new_expense(expense: CreateExpenseRequest, response: Response):
     except Exception as e:
         print(repr(e))
         raise HTTPException(
-            status_code=400, detail="An error occurred while creating the group"
+            status_code=400, detail="An error occurred while creating the expense"
         )

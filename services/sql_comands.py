@@ -84,23 +84,50 @@ class SQLMachine:
 
         return id
     
+    def update(self, schema, table, condition, data):
+        """
+        Update the data in schema.table according to condition.
+        Returns the number of affected rows.
+        """
+
+        conditions = [f"{x} = %s" for x in condition]
+        conditions = " AND ".join(conditions)
+
+        set_columns = [f"{x} = %s" for x in data]
+        set_columns = ", ".join(set_columns)
+
+        query = f"UPDATE {schema}.{table} SET {set_columns} WHERE {conditions}"
+
+        values = list(data.values())
+        values.extend(list(condition.values()))
+
+        connection = self.create_connection()
+        with connection.cursor() as cursor:
+            cursor.execute(query, values)
+            result = cursor.rowcount
+
+        connection.close()
+
+        return result
+    
     def delete(self, schema, table, data=None):
         """
         Delete all rows from the table which meet the conditions.
         """
 
         if data is not None:
-            conditions = [f"{x} = {data[x]}" for x in data]
+            conditions = [f"{x} = %s" for x in data]
             conditions = " AND ".join(conditions)
             query = f"DELETE FROM {schema}.{table} WHERE {conditions}"
+            values = list(data.values())
         else:
             # construct our query.
-            query = f"DELETE FROM {schema}.{table}"
+            query = f"DELETE FROM {schema}.{table}" # lowkey you should not even be able to do this 😭
 
         connection = self.create_connection()
 
         with connection.cursor() as cursor:
-            cursor.execute(query)
+            cursor.execute(query, values)
             result = cursor.rowcount
 
         connection.close()
