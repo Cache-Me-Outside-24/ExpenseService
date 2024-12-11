@@ -30,7 +30,7 @@ def get_payments(expense_id: str):
     payments_result = sql.select("expense_service_db", "payments", {"expense_id": expense_id})
 
     if not payments_result:
-        raise HTTPException(status_code=404, detail="Payments.")
+        raise HTTPException(status_code=404, detail="Payments not found.")
     
     payments = []
 
