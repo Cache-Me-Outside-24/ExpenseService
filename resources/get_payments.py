@@ -21,7 +21,7 @@ class GetPaymentsResponse(BaseModel):
         200: {
             "description": "Request successful."
         },
-        404: {"description": "Expense not found. The specified expense ID does not exist."},
+        404: {"description": "Payments not found. No payments exist under the specified expense ID."},
     },
 )
 def get_payments(expense_id: str):
@@ -30,7 +30,7 @@ def get_payments(expense_id: str):
     payments_result = sql.select("expense_service_db", "payments", {"expense_id": expense_id})
 
     if not payments_result:
-        raise HTTPException(status_code=404, detail="Expense not found")
+        raise HTTPException(status_code=404, detail="Payments.")
     
     payments = []
 
