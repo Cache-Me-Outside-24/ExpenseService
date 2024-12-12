@@ -17,7 +17,7 @@ class GetUserExpenseResponse(BaseModel):
 
 
 @router.get(
-    "/expenses/user/{user_id}",
+    "/expenses/payee/{user_id}",
     response_model=List[GetUserExpenseResponse],
     status_code=200,
     summary="Get all expenses associated with user ID",
@@ -37,7 +37,7 @@ def get_user_expenses(user_id: str):
         expenses = sql.select(
             schema="expense_service_db",
             table="expense",
-            data={"payer_id": user_id},
+            data={"payee_id": user_id},
         )
 
         if not expenses:
