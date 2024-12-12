@@ -15,7 +15,7 @@ class SQLMachine:
         Returns the connection.
         """
         connection = pymysql.connect(
-            host=os.getenv("DATABASE_IP"),
+            unix_socket=f"/cloudsql/{os.getenv('DATABASE_IP')}",
             port=int(os.getenv("DATABASE_PORT")),
             user=os.getenv("DATABASE_UNAME"),
             passwd=os.getenv("DATABASE_PWORD"),
