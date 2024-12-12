@@ -5,6 +5,7 @@ import os
 # Use our .env file to set up the environment variables.
 load_dotenv()
 
+
 class SQLMachine:
     def create_connection(self):
         """
@@ -46,7 +47,7 @@ class SQLMachine:
         connection.close()
 
         return result
-    
+
     def select_paginated(self, schema, table, limit, offset):
         """
         Select a limited number of entries from a table in a schema within
@@ -60,16 +61,16 @@ class SQLMachine:
         with connection.cursor() as cursor:
             cursor.execute(query, (limit, offset))
             paginated_results = cursor.fetchall()
-            
+
             cursor.execute(count_query)
             total_count = cursor.fetchone()[0]
 
         connection.close()
-    
+
         return {"results": paginated_results, "total_count": total_count}
 
     def insert(self, schema, table, data):
-        columns = ", ".join(data.keys())
+        columns = ", ".join([f"`{col}`" for col in data.keys()])
         placeholders = ", ".join(["%s"] * len(data))
 
         query = f"INSERT INTO {schema}.{table} ({columns}) VALUES ({placeholders})"
@@ -83,7 +84,7 @@ class SQLMachine:
         connection.close()
 
         return id
-    
+
     def update(self, schema, table, condition, data):
         """
         Update the data in schema.table according to condition.
@@ -109,7 +110,7 @@ class SQLMachine:
         connection.close()
 
         return result
-    
+
     def delete(self, schema, table, data=None):
         """
         Delete all rows from the table which meet the conditions.
@@ -122,7 +123,7 @@ class SQLMachine:
             values = list(data.values())
         else:
             # construct our query.
-            query = f"DELETE FROM {schema}.{table}" # lowkey you should not even be able to do this 😭
+            query = f"DELETE FROM {schema}.{table}"  # lowkey you should not even be able to do this 😭
 
         connection = self.create_connection()
 

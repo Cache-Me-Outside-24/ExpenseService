@@ -1,15 +1,18 @@
 from fastapi import APIRouter, HTTPException, Response
 from services.sql_comands import SQLMachine
 from models.create_expense_request import CreateExpenseRequest
+from models.create_user_expense_split import CreateUserExpenseSplit
 from models.link import Link
 from pydantic import BaseModel
 from typing import List
 
 router = APIRouter()
 
+
 class CreateExpenseResponse(BaseModel):
     expense_id: int
     links: List[Link]
+
 
 @router.post(
     "/expenses",
@@ -23,14 +26,18 @@ class CreateExpenseResponse(BaseModel):
                 "Link": {
                     "description": "URL of the created resource",
                     "schema": {"type": "string"},
-                    "example": "</expenses/1>; rel=\"\created-resource\""
+                    "example": '</expenses/1>; rel="\created-resource"',
                 }
-            }
+            },
         },
-        400: {"description": "Bad Request - Could not create the expense"}
-    }
+        400: {"description": "Bad Request - Could not create the expense"},
+    },
 )
-def create_new_expense(expense: CreateExpenseRequest, response: Response):
+def create_new_expense(
+    expense: CreateExpenseRequest,
+    splits: List[CreateUserExpenseSplit],
+    response: Response,
+):
     try:
         sql = SQLMachine()
 
@@ -41,11 +48,27 @@ def create_new_expense(expense: CreateExpenseRequest, response: Response):
             "total": expense_data["total"],
             "description": expense_data["description"],
             "group_id": expense_data["group_id"],
-            "owed_to": expense_data["owed_to"]
+            "owed_to": expense_data["owed_to"],
         }
 
         # insert expense data into db
         id = sql.insert("expense_service_db", "expenses", expenses_insert)
+
+        for split in splits:
+            split_data = split.model_dump()
+            expense_split_insert = {
+                "Expense ID": id,
+                "Group ID": split_data["group_id"],
+                "Payer ID": split_data["payer_id"],
+                "Amount": split_data["amount"],
+                "Timestamp": split_data["timestamp"],
+                "Payee ID": split_data["payee_id"],
+                "Payer Confirm": split_data["payer_confirm"],
+                "Payee Confirm": split_data["payee_confirm"],
+                "Label": split_data["label"],
+            }
+
+            sql.insert("expense_service_db", "expense", expense_split_insert)
 
         # insert each payment into db
         for payment in expense_data["payments"]:
@@ -53,7 +76,7 @@ def create_new_expense(expense: CreateExpenseRequest, response: Response):
                 "expense_id": id,
                 "payer_id": payment["payer_id"],
                 "amount_owed": payment["amount_owed"],
-                "paid": payment["paid"]
+                "paid": payment["paid"],
             }
 
             sql.insert("expense_service_db", "payments", payments_insert)
@@ -61,7 +84,7 @@ def create_new_expense(expense: CreateExpenseRequest, response: Response):
         # HATEOAS links
         links = [
             {"rel": "self", "href": f"/api/expenses/{id}"},
-            {"rel": "payments", "href": f"/api/expenses/{id}/payments"}
+            {"rel": "payments", "href": f"/api/expenses/{id}/payments"},
         ]
 
         response.headers["Link"] = f'</groups/{id}>; rel="created_resource"'
