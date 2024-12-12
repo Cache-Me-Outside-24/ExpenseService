@@ -37,7 +37,7 @@ def get_user_expenses(user_id: str):
         expenses = sql.select(
             schema="expense_service_db",
             table="expense",
-            data={"Payee ID": user_id},
+            data={"`Payee ID`": user_id},
         )
 
         if not expenses:
