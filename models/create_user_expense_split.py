@@ -6,7 +6,7 @@ class CreateUserExpenseSplit(BaseModel):
     group_id: int
     payer_id: str
     amount: float
-    timestamp: datetime
+    timestamp: str
     payee_id: str
     payer_confirm: bool
     payee_confirm: bool
