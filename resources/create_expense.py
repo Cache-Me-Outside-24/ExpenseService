@@ -11,6 +11,7 @@ router = APIRouter()
 
 class CreateExpenseResponse(BaseModel):
     expense_id: int
+    split_ids: List[int]
     links: List[Link]
 
 
@@ -54,6 +55,7 @@ def create_new_expense(
         # insert expense data into db
         id = sql.insert("expense_service_db", "expenses", expenses_insert)
 
+        split_ids = []
         for split in splits:
             split_data = split.model_dump()
             expense_split_insert = {
@@ -68,7 +70,8 @@ def create_new_expense(
                 "Label": split_data["label"],
             }
 
-            sql.insert("expense_service_db", "expense", expense_split_insert)
+            split_id = sql.insert("expense_service_db", "expense", expense_split_insert)
+            split_ids.append(split_id)
 
         # insert each payment into db
         for payment in expense_data["payments"]:
@@ -88,8 +91,7 @@ def create_new_expense(
         ]
 
         response.headers["Link"] = f'</groups/{id}>; rel="created_resource"'
-        return CreateExpenseResponse(expense_id=id, links=links)
-
+        return CreateExpenseResponse(expense_id=id, split_ids=split_ids, links=links)
     except Exception as e:
         print(repr(e))
         raise HTTPException(
