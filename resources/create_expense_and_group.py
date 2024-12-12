@@ -108,7 +108,7 @@ def create_new_expense_and_group(
                 "group_name": group_data["name"],
                 "group_photo": group_data["group_photo"],
                 "group_members": group_data["members"],
-                "splits": splits,
+                "splits": [split.model_dump() for split in splits],
                 "total": expense_data["total"],
                 "description": expense_data["description"],
             }
