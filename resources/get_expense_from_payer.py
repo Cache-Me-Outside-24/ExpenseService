@@ -37,7 +37,7 @@ def get_user_expenses(user_id: str):
         expenses = sql.select(
             schema="expense_service_db",
             table="expense",
-            data={"Payer ID": user_id},
+            data={"`Payer ID`": user_id},
         )
 
         if not expenses:
@@ -51,7 +51,7 @@ def get_user_expenses(user_id: str):
             expense_id = expense[0]  # Expense ID
             group_id = expense[1]  # Group ID
             amount = expense[3]  # Amount
-            description = expense[4]  # Description
+            description = expense[8]  # Description
 
             # Fetch group name using group_id
             group = sql.select(
