@@ -3,6 +3,7 @@ from services.sql_comands import SQLMachine
 from pydantic import BaseModel
 from typing import List
 from models.link import Link
+from datetime import datetime
 
 router = APIRouter()
 
@@ -13,6 +14,7 @@ class GetUserExpenseResponse(BaseModel):
     description: str
     group_id: int
     group_name: str
+    timestamp: datetime
     links: List[Link]
 
 
@@ -52,6 +54,9 @@ def get_user_expenses(user_id: str):
             group_id = expense[1]  # Group ID
             amount = expense[3]  # Amount
             description = expense[8]  # Description
+            description = expense[8]  # Description
+            timestamp = expense[4]
+            payee_id = expense[5]
 
             # Fetch group name using group_id
             group = sql.select(
@@ -64,6 +69,13 @@ def get_user_expenses(user_id: str):
                 group_name = "Unknown Group"
             else:
                 group_name = group[0][1]  # Assuming group_name is the second column
+
+            user = sql.select("user_service_db", "users", {"user_id": payee_id})
+
+            if not user:
+                user_name = "Unknown"
+            else:
+                user_name = user[0][2]
 
             # Create HATEOAS links
             links = [
@@ -79,6 +91,8 @@ def get_user_expenses(user_id: str):
                     description=description,
                     group_id=group_id,
                     group_name=group_name,
+                    timestamp=timestamp,
+                    name=user_name,
                     links=links,
                 )
             )
