@@ -73,15 +73,15 @@ def create_new_expense(
             split_ids.append(split_id)
 
         # insert each payment into db
-        for payment in expense_data["payments"]:
-            payments_insert = {
-                "expense_id": id,
-                "payer_id": payment["payer_id"],
-                "amount_owed": payment["amount_owed"],
-                "paid": payment["paid"],
-            }
+        # for payment in expense_data["payments"]:
+        #     payments_insert = {
+        #         "expense_id": id,
+        #         "payer_id": payment["payer_id"],
+        #         "amount_owed": payment["amount_owed"],
+        #         "paid": payment["paid"],
+        #     }
 
-            sql.insert("expense_service_db", "payments", payments_insert)
+        #     sql.insert("expense_service_db", "payments", payments_insert)
 
         # HATEOAS links
         links = [
