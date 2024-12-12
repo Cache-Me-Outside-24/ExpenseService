@@ -5,7 +5,7 @@ import uvicorn
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
-from resources import create_expense, get_expense_from_id, delete_expense, get_payment, get_payments, put_payment, delete_payment
+from resources import create_expense, get_expense_from_id, delete_expense, get_payment, get_payments, put_payment, delete_payment, create_expense_and_group
 
 app = FastAPI()
 
@@ -16,6 +16,7 @@ app.include_router(get_payments.router)
 app.include_router(get_payment.router)
 app.include_router(put_payment.router)
 app.include_router(delete_payment.router)
+app.include_router(create_expense_and_group.router)
 
 # set up middleware logging
 logging.basicConfig(level=logging.INFO)
