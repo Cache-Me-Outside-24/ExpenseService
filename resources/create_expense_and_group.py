@@ -59,7 +59,7 @@ def create_new_expense_and_group(
         }
 
         id = sql.insert("expense_service_db", "expenses", expenses_insert)
-
+        split_ids = []
         for split in splits:
             split_data = split.model_dump()
             expense_split_insert = {
@@ -74,8 +74,8 @@ def create_new_expense_and_group(
                 "Label": split_data["label"],
             }
 
-            sql.insert("expense_service_db", "expense", expense_split_insert)
-
+            split_id = sql.insert("expense_service_db", "expense", expense_split_insert)
+            split_ids.append(split_id)
         # commented out for now since payments isnt being implemented
         """
         # Insert payments
@@ -114,7 +114,7 @@ def create_new_expense_and_group(
         ]
 
         response.headers["Link"] = f'</groups/{id}>; rel="created_resource"'
-        return CreateExpenseResponse(expense_id=id, links=links)
+        return CreateExpenseResponse(expense_id=id, split_ids=split_ids, links=links)
 
     except Exception as e:
         print(repr(e))
