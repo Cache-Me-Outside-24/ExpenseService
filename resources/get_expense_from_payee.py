@@ -15,6 +15,7 @@ class GetUserExpenseResponse(BaseModel):
     group_id: int
     group_name: str
     timestamp: datetime
+    name: str
     links: List[Link]
 
 
@@ -69,7 +70,7 @@ def get_user_expenses(user_id: str):
             else:
                 group_name = group[0][1]  # Assuming group_name is the second column
 
-            user = sql.select("user_service_db", "users", {"user_id": payer_id})
+            user = sql.select("user_service_db", "users", {"id": payer_id})
 
             if not user:
                 user_name = "Unknown"
