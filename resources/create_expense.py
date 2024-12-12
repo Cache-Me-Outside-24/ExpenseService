@@ -62,7 +62,7 @@ def create_new_expense(
                 "Group ID": split_data["group_id"],
                 "Payer ID": split_data["payer_id"],
                 "Amount": split_data["amount"],
-                "Timestamp": split_data["timestamp"],
+                "Timestamp": str(split_data["timestamp"]),
                 "Payee ID": split_data["payee_id"],
                 "Payer Confirm": split_data["payer_confirm"],
                 "Payee Confirm": split_data["payee_confirm"],

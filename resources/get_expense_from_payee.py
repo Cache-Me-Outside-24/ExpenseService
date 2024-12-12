@@ -3,7 +3,7 @@ from services.sql_comands import SQLMachine
 from pydantic import BaseModel
 from typing import List
 from models.link import Link
-from datetime import datetime
+
 
 router = APIRouter()
 
@@ -14,7 +14,7 @@ class GetUserExpenseResponse(BaseModel):
     description: str
     group_id: int
     group_name: str
-    timestamp: datetime
+    timestamp: str
     name: str
     links: List[Link]
 
