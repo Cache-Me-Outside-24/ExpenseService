@@ -5,7 +5,18 @@ import uvicorn
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
-from resources import create_expense, get_expense_from_id, delete_expense, get_payment, get_payments, put_payment, delete_payment, create_expense_and_group
+from resources import (
+    create_expense,
+    get_expense_from_id,
+    get_expense_from_payer,
+    get_expense_from_payee,
+    delete_expense,
+    get_payment,
+    get_payments,
+    put_payment,
+    delete_payment,
+    create_expense_and_group,
+)
 
 app = FastAPI()
 
@@ -17,10 +28,13 @@ app.include_router(get_payment.router)
 app.include_router(put_payment.router)
 app.include_router(delete_payment.router)
 app.include_router(create_expense_and_group.router)
+app.include_router(get_expense_from_payer.router)
+app.include_router(get_expense_from_payee.router)
 
 # set up middleware logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
 
 # middleware to log requests before and after
 @app.middleware("http")
@@ -39,6 +53,7 @@ async def log_requests(request: Request, call_next):
 
     return response
 
+
 # CORS configuration
 app.add_middleware(
     CORSMiddleware,
@@ -48,6 +63,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 @app.get("/")
 def get_root():
     # GroupService info
@@ -56,6 +72,7 @@ def get_root():
         "description": "Manages expense management and detail retrieval",
     }
     return microservice_info
+
 
 if __name__ == "__main__":
     import uvicorn

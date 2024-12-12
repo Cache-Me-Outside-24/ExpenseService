@@ -8,7 +8,7 @@ from typing import List
 from google.cloud import pubsub_v1
 import json
 
-publisher = pubsub_v1.PublisherClient()
+# publisher = pubsub_v1.PublisherClient()
 topic_path = "projects/cache-me-outside-437317/topics/create-expense-group"
 
 router = APIRouter()
@@ -55,7 +55,6 @@ def create_new_expense_and_group(
             "total": expense_data["total"],
             "description": expense_data["description"],
             "group_id": expense_data["group_id"],
-            "owed_to": expense_data["owed_to"],
         }
 
         id = sql.insert("expense_service_db", "expenses", expenses_insert)
@@ -90,22 +89,22 @@ def create_new_expense_and_group(
         """
 
         # Publish to Pub/Sub
-        publisher = pubsub_v1.PublisherClient()
-        topic_path = "projects/cache-me-outside-437317/topics/create-expense-group"
+        # publisher = pubsub_v1.PublisherClient()
+        # topic_path = "projects/cache-me-outside-437317/topics/create-expense-group"
 
-        # Prepare message data
-        message_data = json.dumps(
-            {
-                "expense_id": id,
-                "total": expense_data["total"],
-                "description": expense_data["description"],
-                "group_id": expense_data["group_id"],
-            }
-        ).encode("utf-8")
+        # # Prepare message data
+        # message_data = json.dumps(
+        #     {
+        #         "expense_id": id,
+        #         "total": expense_data["total"],
+        #         "description": expense_data["description"],
+        #         "group_id": expense_data["group_id"],
+        #     }
+        # ).encode("utf-8")
 
-        # Publish message
-        future = publisher.publish(topic_path, message_data)
-        message_id = future.result()
+        # # Publish message
+        # future = publisher.publish(topic_path, message_data)
+        # message_id = future.result()
 
         # Create HATEOAS links
         links = [

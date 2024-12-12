@@ -3,3 +3,4 @@ __pycache__
 .hehehe
 .env
 service-account-key.json
+.myenv
