@@ -105,7 +105,7 @@ def create_new_expense_and_group(
         # Prepare message data
         message_data = json.dumps(
             {
-                "group_name": group_data["group_name"],
+                "group_name": group_data["name"],
                 "group_photo": group_data["group_photo"],
                 "group_members": group_data["members"],
                 "splits": splits,
