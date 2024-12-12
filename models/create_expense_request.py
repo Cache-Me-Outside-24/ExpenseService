@@ -7,5 +7,3 @@ class CreateExpenseRequest(BaseModel):
     total: float
     description: str
     group_id: int
-    owed_to: str
-    payments: List[Payment]

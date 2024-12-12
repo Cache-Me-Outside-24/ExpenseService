@@ -48,7 +48,6 @@ def create_new_expense(
             "total": expense_data["total"],
             "description": expense_data["description"],
             "group_id": expense_data["group_id"],
-            "owed_to": expense_data["owed_to"],
         }
 
         # insert expense data into db

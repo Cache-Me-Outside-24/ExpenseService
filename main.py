@@ -8,7 +8,8 @@ from dotenv import load_dotenv
 from resources import (
     create_expense,
     get_expense_from_id,
-    get_expense_from_user,
+    get_expense_from_payer,
+    get_expense_from_payee,
     delete_expense,
     get_payment,
     get_payments,
@@ -27,7 +28,8 @@ app.include_router(get_payment.router)
 app.include_router(put_payment.router)
 app.include_router(delete_payment.router)
 app.include_router(create_expense_and_group.router)
-app.include_router(get_expense_from_user.router)
+app.include_router(get_expense_from_payer.router)
+app.include_router(get_expense_from_payee.router)
 
 # set up middleware logging
 logging.basicConfig(level=logging.INFO)
