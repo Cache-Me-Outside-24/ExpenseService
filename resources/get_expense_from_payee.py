@@ -16,6 +16,7 @@ class GetUserExpenseResponse(BaseModel):
     group_name: str
     timestamp: str
     name: str
+    email: str
     links: List[Link]
 
 
