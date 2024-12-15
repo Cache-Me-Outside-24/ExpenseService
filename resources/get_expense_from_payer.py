@@ -16,6 +16,7 @@ class GetUserExpenseResponse(BaseModel):
     timestamp: str
     name: str
     payee_id: str
+    confirm: bool
     links: List[Link]
 
 
