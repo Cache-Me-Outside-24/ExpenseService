@@ -17,7 +17,7 @@ class GetUserExpenseResponse(BaseModel):
     timestamp: str
     name: str
     payer_id: str
-    confrim: bool
+    confirm: bool
     email: str
     links: List[Link]
 
