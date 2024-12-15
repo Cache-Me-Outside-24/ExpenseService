@@ -76,6 +76,7 @@ def get_user_expenses(user_id: str):
                 user_name = "Unknown"
             else:
                 user_name = user[0][2]
+                user_email = user[0][1]
 
             # Create HATEOAS links
             links = [
@@ -93,6 +94,7 @@ def get_user_expenses(user_id: str):
                     group_name=group_name,
                     timestamp=timestamp,
                     name=user_name,
+                    email=user_email,
                     links=links,
                 )
             )
