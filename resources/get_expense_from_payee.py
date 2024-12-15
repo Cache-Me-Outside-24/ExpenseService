@@ -16,6 +16,8 @@ class GetUserExpenseResponse(BaseModel):
     group_name: str
     timestamp: str
     name: str
+    payer_id: str
+    confrim: bool
     email: str
     links: List[Link]
 
@@ -52,6 +54,10 @@ def get_user_expenses(user_id: str):
         expense_responses = []
 
         for expense in expenses:
+            payer_confirm = expense[6]
+            payee_confirm = expense[7]
+            if payee_confirm and payer_confirm:
+                continue
             expense_id = expense[0]  # Expense ID
             group_id = expense[1]  # Group ID
             amount = expense[3]  # Amount
@@ -95,6 +101,8 @@ def get_user_expenses(user_id: str):
                     group_name=group_name,
                     timestamp=timestamp,
                     name=user_name,
+                    confirm=payer_confirm,
+                    payer_id=payer_id,
                     email=user_email,
                     links=links,
                 )
