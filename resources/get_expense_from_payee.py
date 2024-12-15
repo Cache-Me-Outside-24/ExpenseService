@@ -18,6 +18,7 @@ class GetUserExpenseResponse(BaseModel):
     name: str
     payer_id: str
     confrim: bool
+    email: str
     links: List[Link]
 
 
@@ -82,6 +83,7 @@ def get_user_expenses(user_id: str):
                 user_name = "Unknown"
             else:
                 user_name = user[0][2]
+                user_email = user[0][1]
 
             # Create HATEOAS links
             links = [
@@ -101,6 +103,7 @@ def get_user_expenses(user_id: str):
                     name=user_name,
                     confirm=payer_confirm,
                     payer_id=payer_id,
+                    email=user_email,
                     links=links,
                 )
             )

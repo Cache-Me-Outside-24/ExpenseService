@@ -13,14 +13,17 @@ topic_path = "projects/cache-me-outside-437317/topics/create-expense-group"
 
 router = APIRouter()
 
+
 class CreateGroupRequest(BaseModel):
     name: str  # name of the group
     group_photo: str = None  # link to a picture for the group
     members: List[str]  # list of group members (emails)
 
+
 class CreateExpenseAndGroupRequest(BaseModel):
     expense: CreateExpenseRequest
     group: CreateGroupRequest
+
 
 class CreateExpenseResponse(BaseModel):
     expense_id: int
@@ -57,34 +60,38 @@ def create_new_expense_and_group(
 
         data = data.model_dump()
         # Your existing expense creation logic
-        expense_data = data['expense']
-        group_data = data['group']
+        expense_data = data["expense"]
+        group_data = data["group"]
 
         # Insert expense
-        # expenses_insert = {
-        #     "total": expense_data["total"],
-        #     "description": expense_data["description"],
-        #     "group_id": expense_data["group_id"],
-        # }
+        # format request data as expected by SQLMachine
+        expenses_insert = {
+            "total": expense_data["total"],
+            "description": expense_data["description"],
+            "group_id": expense_data["group_id"],
+        }
 
-        # id = sql.insert("expense_service_db", "expenses", expenses_insert)
-        # split_ids = []
-        # for split in splits:
-        #     split_data = split.model_dump()
-        #     expense_split_insert = {
-        #         "Expense ID": id,
-        #         "Group ID": split_data["group_id"],
-        #         "Payer ID": split_data["payer_id"],
-        #         "Amount": split_data["amount"],
-        #         "Timestamp": split_data["timestamp"],
-        #         "Payee ID": split_data["payee_id"],
-        #         "Payer Confirm": split_data["payer_confirm"],
-        #         "Payee Confirm": split_data["payee_confirm"],
-        #         "Label": split_data["label"],
-        #     }
+        # insert expense data into db
+        id = sql.insert("expense_service_db", "expenses", expenses_insert)
 
-        #     split_id = sql.insert("expense_service_db", "expense", expense_split_insert)
-        #     split_ids.append(split_id)
+        split_ids = []
+        for split in splits:
+            split_data = split.model_dump()
+            expense_split_insert = {
+                "Expense ID": id,
+                "Group ID": split_data["group_id"],
+                "Payer ID": split_data["payer_id"],
+                "Amount": split_data["amount"],
+                "Timestamp": str(split_data["timestamp"]),
+                "Payee ID": split_data["payee_id"],
+                "Payer Confirm": split_data["payer_confirm"],
+                "Payee Confirm": split_data["payee_confirm"],
+                "Label": split_data["label"],
+            }
+
+            split_id = sql.insert("expense_service_db", "expense", expense_split_insert)
+            split_ids.append(split_id)
+
         # commented out for now since payments isnt being implemented
         """
         # Insert payments
@@ -98,7 +105,7 @@ def create_new_expense_and_group(
             sql.insert("expense_service_db", "payments", payments_insert)
         """
 
-        #Publish to Pub/Sub
+        # Publish to Pub/Sub
         publisher = pubsub_v1.PublisherClient()
         topic_path = "projects/cache-me-outside-437317/topics/create-expense-group"
 
@@ -118,7 +125,10 @@ def create_new_expense_and_group(
         future = publisher.publish(topic_path, message_data)
         message_id = future.result()
 
-        return Response(status_code=202, content="Check your account in a bit for the created resources.")
+        return Response(
+            status_code=202,
+            content="Check your account in a bit for the created resources.",
+        )
 
     except Exception as e:
         print(repr(e))
