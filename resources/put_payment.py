@@ -8,8 +8,18 @@ from models.link import Link
 router = APIRouter()
 
 
+class PaymentPut(BaseModel):
+    expense_id: Optional[int] = Field(None)
+    payer_id: str
+    amount_owed: float
+    paid: bool
+    method: str
+    group_id: int
+    payee_id: str
+
+
 class PutPaymentResponse(BaseModel):
-    payment: Payment
+    payment: PaymentPut
     links: List[Link]
 
 
@@ -55,6 +65,7 @@ def put_payment(request: PutPaymentRequest, expense_id: str, payer_id: str):
         "paid": False,
         "method": method,
         "group_id": group_id,
+        "payee_id": payee_id,
     }
     # HATEOAS links
     links = [

@@ -1,63 +1,66 @@
-from fastapi import APIRouter, HTTPException
+from ariadne import QueryType, gql, make_executable_schema
 from services.sql_comands import SQLMachine
-from pydantic import BaseModel
-from typing import List
-from models.payment import Payment
-from models.link import Link
 
-router = APIRouter()
+# Define your GraphQL schema
+type_defs = gql(
+    """
+    type Payment {
+        expenseId: Int
+        payerId: String
+        amountOwed: Float
+        paid: Boolean
+        method: String
+        groupId: Int
+        groupName: String
+        payeeName: String
+    }
 
-
-class GetPaymentsResponse(BaseModel):
-    payments: List[Payment]
-    links: List[Link]
-
-
-@router.get(
-    "/expenses/{user_id}/payments",
-    response_model=GetPaymentsResponse,
-    status_code=200,
-    summary="Get all of the payments for an expense",
-    description="Retrieve detailed information about an expense's associated payments by its unique ID.",
-    responses={
-        200: {"description": "Request successful."},
-        404: {
-            "description": "Payments not found. No payments exist under the specified expense ID."
-        },
-    },
+    type Query {
+        payments(userId: String!): [Payment!]!
+    }
+"""
 )
-def get_payments(user_id: str):
+
+# Resolver for the "payments" query
+query = QueryType()
+
+
+@query.field("payments")
+def resolve_payments(_, info, userId):
     sql = SQLMachine()
 
-    payments_result = sql.select(
-        "expense_service_db", "payments", {"payer_id": user_id}
-    )
-
+    # Fetch payments for the user
+    payments_result = sql.select("expense_service_db", "payments", {"payer_id": userId})
     if not payments_result:
-        raise HTTPException(status_code=404, detail="Payments not found.")
+        return []
 
     payments = []
-
     for payment in payments_result:
+        # Fetch group details
         group_details = sql.select(
             "group_service_db", "groups", {"group_id": payment[5]}
         )
-        group_name = group_details[0][1]
+        group_name = group_details[0][1] if group_details else "Unknown"
+        # Fetch payee name
+        user_details = sql.select("user_service_db", "users", {"id": payment[6]})
+
+        payee_name = user_details[0][2] if user_details else "Unknown"
+
         payments.append(
-            Payment(
-                expense_id=payment[0],
-                payer_id=payment[1],
-                amount_owed=payment[2],
-                paid=payment[3],
-                method=payment[4],
-                group_name=group_name,
-            )
+            {
+                "expenseId": payment[0],
+                "payerId": payment[1],
+                "amountOwed": payment[2],
+                "paid": payment[3],
+                "method": payment[4],
+                "groupId": payment[5],
+                "groupName": group_name,
+                "payeeName": payee_name,
+            }
         )
 
-    # HATEOAS links
-    links = [
-        {"rel": "self", "href": f"/api/expenses/{user_id}/payments"},
-        {"rel": "expense", "href": f"/api/expenses/{user_id}"},
-    ]
+    return payments
 
-    return GetPaymentsResponse(payments=payments, links=links)
+
+# Create the Ariadne executable schema
+schema = make_executable_schema(type_defs, query)
