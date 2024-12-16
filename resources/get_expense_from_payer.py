@@ -100,7 +100,7 @@ def get_user_expenses(user_id: str):
                     timestamp=timestamp,
                     name=user_name,
                     payee_id=payee_id,
-                    confirm=payee_confirm,
+                    confirm=payer_confirm,
                     links=links,
                 )
             )
