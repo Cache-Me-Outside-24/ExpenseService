@@ -16,6 +16,7 @@ from resources import (
     put_payment,
     delete_payment,
     create_expense_and_group,
+    confirm_payment,
 )
 
 app = FastAPI()
@@ -30,6 +31,7 @@ app.include_router(delete_payment.router)
 app.include_router(create_expense_and_group.router)
 app.include_router(get_expense_from_payer.router)
 app.include_router(get_expense_from_payee.router)
+app.include_router(confirm_payment.router)
 
 # set up middleware logging
 logging.basicConfig(level=logging.INFO)
