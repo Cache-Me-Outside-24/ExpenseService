@@ -1,7 +1,7 @@
 import logging
 import time
 import uvicorn
-
+from ariadne.asgi import GraphQL
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
@@ -17,6 +17,7 @@ from resources import (
     delete_payment,
     create_expense_and_group,
     confirm_payment,
+    get_payments_by_user,
 )
 
 app = FastAPI()
@@ -32,6 +33,8 @@ app.include_router(create_expense_and_group.router)
 app.include_router(get_expense_from_payer.router)
 app.include_router(get_expense_from_payee.router)
 app.include_router(confirm_payment.router)
+
+app.add_route("/graphql", GraphQL(get_payments_by_user.schema, debug=True))
 
 # set up middleware logging
 logging.basicConfig(level=logging.INFO)
