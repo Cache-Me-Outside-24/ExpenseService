@@ -14,7 +14,7 @@ class PutPaymentResponse(BaseModel):
 
 
 class PutPaymentRequest(BaseModel):
-    amount_owed: Optional[float] = Field(None)
+    amount_owed: float
     group_id: int
     method: str
     payee_id: str

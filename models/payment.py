@@ -8,4 +8,4 @@ class Payment(BaseModel):
     amount_owed: float
     paid: bool
     method: str
-    group_name: str
+    group_id: str
